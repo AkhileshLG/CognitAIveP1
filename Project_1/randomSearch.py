@@ -8,6 +8,7 @@ def calculateDistance(xOne, xTwo, yOne, yTwo):
 
 fileName = str(input("Enter the name of file: "))
 
+numOfNodes = 0
 coords = []
 with open(fileName, 'r') as file:
     for x in file:
@@ -15,3 +16,6 @@ with open(fileName, 'r') as file:
         x = float(pairOfCoords[0])
         y = float(pairOfCoords[1])
         coords.append((x,y))
+        numOfNodes += 1
+
+print("There are " + str(numOfNodes) + " nodes, computing route..")
