@@ -67,9 +67,10 @@ if __name__ == "__main__":
         print("There are more than 256 nodes, resulting in no solution")
     else:
         newFileName = file_name[:-4]
-        newFileName = newFileName + "_solution.txt"
-        with open(newFileName, "w") as f:
-            print("Route written to disk as " + str(newFileName))
+        newFileName = newFileName + "_solution"
+
+        with open(newFileName + ".txt", "w") as f:
+            print("Route written to disk as " + str(newFileName) + ".txt")
             for i in range(0, len(best_path)):
                 if i < len(best_path):
                     f.write(str(best_path[i]) + " ")
