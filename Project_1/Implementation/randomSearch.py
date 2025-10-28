@@ -44,6 +44,7 @@ def find_best_rand_path(file_path):
         if distance < best_distance:
             best_distance = distance
             best_path = path
+            print(best_distance)
     return best_distance, best_path
 
 if __name__ == "__main__":
