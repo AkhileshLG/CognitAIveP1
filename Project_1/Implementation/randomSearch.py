@@ -34,7 +34,6 @@ def random_path(coordinates):
     return dist, path
 
 def find_best_rand_path(file_path):
-    interrupted = False
     coords, numOfNodes = read_coords_as_tuple(file_path)
 
     if numOfNodes <= 0:
@@ -42,7 +41,7 @@ def find_best_rand_path(file_path):
     elif numOfNodes > 256:
         return 0, False
     else:
-        print("There are " + str(numOfNodes) + "nodes, computing route..")
+        print("There are " + str(numOfNodes) + " nodes, computing route..")
         print("  Shortest Route Discovered So Far")
     dist_matrix = distance_matrix(coords)
     best_distance = float('inf')
@@ -56,16 +55,23 @@ def find_best_rand_path(file_path):
             best_distance = distance
             best_path = path
             print("    " + str(best_distance))
-    return best_distance, best_path
+    return best_distance, best_path, numOfNodes
 
 if __name__ == "__main__":
     file_name=input("Enter the name of file: ")
-    best_dist, best_path = find_best_rand_path(file_name)
+    best_dist, best_path, numOfNodes = find_best_rand_path(file_name)
 
     if best_path == True:
         print("There are less that 1 node, resulting in no solution")
     elif best_path == False:
         print("There are more than 256 nodes, resulting in no solution")
     else:
-        print(f"Best path found {best_dist}")
-        print(f"Best path {best_path}")
+        newFileName = file_name.strip(".csv")
+        newFileName = newFileName + "_solution.txt"
+        with open(newFileName, "w") as f:
+            print("Route written to disk as " + str(newFileName))
+            for i in range(0, len(best_path)):
+                if i < numOfNodes:
+                    f.write(str(best_path[i]) + " ")
+                else:
+                    f.write(str(best_path[i]))
