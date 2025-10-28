@@ -3,6 +3,7 @@ from typing import List, Tuple
 import numpy as np
 import random
 import msvcrt
+import math
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -47,7 +48,7 @@ def find_best_rand_path(file_path):
     best_distance = float('inf')
     best_path = None
 
-    for i in range(1, 100000):
+    for i in range(0, math.factorial(numOfNodes - 1)):
         if msvcrt.kbhit() and msvcrt.getch() == b"\r":
             break
         distance,path = random_path(dist_matrix)
