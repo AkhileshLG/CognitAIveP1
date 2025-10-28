@@ -6,6 +6,7 @@ import msvcrt
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
+    numOfNodes = 0
     with open(file_path, 'r', newline='') as csvfile:
         csv_reader = csv.reader(csvfile)
         for row_num, row in enumerate(csv_reader, 1):
@@ -13,7 +14,8 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
                 raise ValueError(f"Row {row_num} must contain 2 values")
             x, y = map(float, row)
             coordinates.append((x, y))
-    return coordinates
+            numOfNodes += 1
+    return coordinates, numOfNodes
 
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
@@ -33,10 +35,19 @@ def random_path(coordinates):
 
 def find_best_rand_path(file_path):
     interrupted = False
-    coords = read_coords_as_tuple(file_path)
+    coords, numOfNodes = read_coords_as_tuple(file_path)
+
+    if numOfNodes <= 0:
+        return 0, True
+    elif numOfNodes > 256:
+        return 0, False
+    else:
+        print("There are " + str(numOfNodes) + "nodes, computing route..")
+        print("  Shortest Route Discovered So Far")
     dist_matrix = distance_matrix(coords)
     best_distance = float('inf')
     best_path = None
+
     for i in range(1, 100000):
         if msvcrt.kbhit() and msvcrt.getch() == b"\r":
             break
@@ -44,11 +55,17 @@ def find_best_rand_path(file_path):
         if distance < best_distance:
             best_distance = distance
             best_path = path
-            print(best_distance)
+            print("    " + str(best_distance))
     return best_distance, best_path
 
 if __name__ == "__main__":
-    file_name=input("file path")
+    file_name=input("Enter the name of file: ")
     best_dist, best_path = find_best_rand_path(file_name)
-    print(f"Best path found {best_dist}")
-    print(f"Best path {best_path}")
+
+    if best_path == True:
+        print("There are less that 1 node, resulting in no solution")
+    elif best_path == False:
+        print("There are more than 256 nodes, resulting in no solution")
+    else:
+        print(f"Best path found {best_dist}")
+        print(f"Best path {best_path}")
