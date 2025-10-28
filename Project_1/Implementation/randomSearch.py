@@ -7,7 +7,6 @@ import math
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
-    numOfNodes = 0
     with open(file_path, 'r', newline='') as csvfile:
         csv_reader = csv.reader(csvfile)
         for row_num, row in enumerate(csv_reader, 1):
@@ -15,8 +14,7 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
                 raise ValueError(f"Row {row_num} must contain 2 values")
             x, y = map(float, row)
             coordinates.append((x, y))
-            numOfNodes += 1
-    return coordinates, numOfNodes
+    return coordinates
 
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
@@ -35,20 +33,20 @@ def random_path(coordinates):
     return dist, path
 
 def find_best_rand_path(file_path):
-    coords, numOfNodes = read_coords_as_tuple(file_path)
+    coords = read_coords_as_tuple(file_path)
 
-    if numOfNodes <= 0:
+    if len(coords) <= 0:
         return 0, True
-    elif numOfNodes > 256:
+    elif len(coords) > 256:
         return 0, False
     else:
-        print("There are " + str(numOfNodes) + " nodes, computing route..")
+        print("There are " + str(len(coords)) + " nodes, computing route..")
         print("  Shortest Route Discovered So Far")
     dist_matrix = distance_matrix(coords)
     best_distance = float('inf')
     best_path = None
 
-    for i in range(0, math.factorial(numOfNodes - 1)):
+    for i in range(0, math.factorial(len(coords) - 1)):
         if msvcrt.kbhit() and msvcrt.getch() == b"\r":
             break
         distance,path = random_path(dist_matrix)
@@ -56,12 +54,12 @@ def find_best_rand_path(file_path):
             best_distance = distance
             best_path = path
             print("    " + str(best_distance))
-    return best_distance, best_path, numOfNodes
+    return best_distance, best_path, coords
 
 if __name__ == "__main__":
     file_name=input("Enter the name of file: ")
     tempFileName = "../Dataset_csv/" + file_name
-    best_dist, best_path, numOfNodes = find_best_rand_path(tempFileName)
+    best_dist, best_path, coords = find_best_rand_path(tempFileName)
 
     if best_path == True:
         print("There are less that 1 node, resulting in no solution")
@@ -73,7 +71,7 @@ if __name__ == "__main__":
         with open(newFileName, "w") as f:
             print("Route written to disk as " + str(newFileName))
             for i in range(0, len(best_path)):
-                if i < numOfNodes:
+                if i < len(best_path):
                     f.write(str(best_path[i]) + " ")
                 else:
                     f.write(str(best_path[i]))
