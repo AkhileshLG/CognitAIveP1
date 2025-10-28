@@ -4,6 +4,27 @@ import numpy as np
 import random
 import msvcrt
 import math
+import matplotlib.pyplot as plt
+
+def plotAndSavePath(coords, best_path, fileName):
+    x = [float(coords[i][0]) for i in best_path]
+    y = [float(coords[i][1]) for i in best_path]
+
+    plt.plot(x, y, '-o', color='blue', markersize=6)
+    plt.scatter(x[0], y[0], color='orange', s=100, zorder=5)
+    
+    for i, (x_i, y_i) in enumerate(coords):
+        plt.text(x_i + 0.1, y_i + 0.1, str(i), fontsize=10)
+    
+    plt.title(fileName + " Path")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.grid(True)
+    plt.axis("equal")
+    plt.tight_layout()
+
+    plt.savefig(fileName + "_path.jpg", format='jpg', dpi=300)
+    return
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -76,3 +97,5 @@ if __name__ == "__main__":
                     f.write(str(best_path[i]) + " ")
                 else:
                     f.write(str(best_path[i]))
+        
+        plotAndSavePath(coords, best_path, newFileName)
