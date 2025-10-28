@@ -27,9 +27,9 @@ def distance_matrix(coordinates):
 
 def random_path(coordinates):
     n = len(coordinates)
-    path = list(range(n))
-    random.shuffle(path)
-    path.append(path[0])
+    middle = list(range(1, n))
+    random.shuffle(middle)
+    path = [0] + middle + [0]
     dist = sum(coordinates[path[i]][path[i+1]] for i in range(n))
     return dist, path
 
