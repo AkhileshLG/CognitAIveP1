@@ -66,7 +66,7 @@ if __name__ == "__main__":
     elif best_path == False:
         print("There are more than 256 nodes, resulting in no solution")
     else:
-        newFileName = file_name.strip(".csv")
+        newFileName = file_name[:-4]
         newFileName = newFileName + "_solution.txt"
         with open(newFileName, "w") as f:
             print("Route written to disk as " + str(newFileName))
