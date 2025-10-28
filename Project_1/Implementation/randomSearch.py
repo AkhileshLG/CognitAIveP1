@@ -2,6 +2,7 @@ import csv
 from typing import List, Tuple
 import numpy as np
 import random
+import msvcrt
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -36,7 +37,9 @@ def find_best_rand_path(file_path):
     dist_matrix = distance_matrix(coords)
     best_distance = float('inf')
     best_path = None
-    while ( not interrupted):
+    for i in range(1, 100000):
+        if msvcrt.kbhit() and msvcrt.getch() == b"\r":
+            break
         distance,path = random_path(dist_matrix)
         if distance < best_distance:
             best_distance = distance
