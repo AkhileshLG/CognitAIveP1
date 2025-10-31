@@ -21,6 +21,7 @@ def plotAndSavePath(coords, best_path, fileName):
     plt.ylabel("y")
     plt.grid(True)
     plt.axis("equal")
+    plt.axis("tight")
 
     plt.savefig(fileName + "_path.jpg", format='jpg', dpi=300)
     return
