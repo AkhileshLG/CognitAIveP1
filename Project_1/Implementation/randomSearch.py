@@ -5,6 +5,7 @@ import random
 import msvcrt
 import math
 import matplotlib.pyplot as plt
+import time
 
 def plotAndSavePath(coords, best_path, fileName):
     x = [float(coords[i][0]) for i in best_path]
@@ -67,6 +68,8 @@ def find_best_rand_path(file_path):
     best_distance = float('inf')
     best_path = None
 
+    startTime = time.time()
+
     for i in range(0, math.factorial(len(coords) - 1)):
         if msvcrt.kbhit() and msvcrt.getch() == b"\r":
             break
@@ -74,7 +77,8 @@ def find_best_rand_path(file_path):
         if distance < best_distance:
             best_distance = distance
             best_path = path
-            print("    " + str(best_distance))
+            currTime = time.time() - startTime
+            print("    " + str(best_distance) + " Time: " + str(currTime))
     return best_distance, best_path, coords
 
 if __name__ == "__main__":
