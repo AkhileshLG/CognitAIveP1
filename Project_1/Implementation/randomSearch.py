@@ -79,7 +79,7 @@ def find_best_rand_path(file_path):
 
 if __name__ == "__main__":
     file_name=input("Enter the name of file: ")
-    tempFileName = "../Dataset_csv/" + file_name
+    tempFileName = "../Dataset/" + file_name
     best_dist, best_path, coords = find_best_rand_path(tempFileName)
 
     if best_path == True:
