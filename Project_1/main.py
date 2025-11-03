@@ -100,15 +100,15 @@ def nn_temperature(best_path, matrix):
     return path_length, path
 
 def find_best_path():
-    #need to provide file path
     print("Please Enter Desired Filename: ")
     
     file_name = input().strip()
     
-    #sys.stdin.flush()
-
     base_name = file_name.rsplit('.', 1)[0]
     coordinate_list = read_coords_as_tuple(file_name)
+    num_nodes = len(coordinate_list)
+
+    print(f"There are {num_nodes} total nodes")
 
     dist_matrix = distance_matrix(coordinate_list)
 
@@ -138,12 +138,17 @@ def find_best_path():
             print(f"New best length is {best_length}")
 
 
-    #need to have if statement for keyboard interrupt
     print("\n Search stopped!")
     print(f"The best path is: {math.ceil(best_length)}")
     plot_path(coordinate_list, best_path, f"{base_name}.jpeg")
     print("\n The path order is: ")
     print(best_path)
+
+    solution_file = f"{base_name}_solution.txt"
+
+    with open (solution_file, "w") as f:
+        f.write(", ".join(map(str, best_path)))
+
     return best_path
 
 
