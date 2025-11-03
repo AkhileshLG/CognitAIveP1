@@ -4,6 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import math
+import threading
+import time
+import select
+import sys
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -51,7 +55,7 @@ def plot_path(coords, path, filename):
     plt.tight_layout()
     plt.savefig(filename, dpi=300, format ='jpeg')
     plt.close()
-#still need to test/add temperature annealing but basic nearest neighbor is done
+
 def nn_temperature(best_path, matrix):
 
     starting_node = 0
@@ -81,7 +85,6 @@ def nn_temperature(best_path, matrix):
                 best_distance = curr_distance
     
         if next_node is None:
-            #not sure if this is correct way to terminate if path length is too large
             return float('inf'), None
         path_length += best_distance
         path.append(next_node)
@@ -98,7 +101,11 @@ def nn_temperature(best_path, matrix):
 
 def find_best_path():
     #need to provide file path
-    file_name = "Dataset_csv/100Triangle300.csv"
+    print("Please Enter Desired Filename: ")
+    
+    file_name = input().strip()
+    
+    #sys.stdin.flush()
 
     base_name = file_name.rsplit('.', 1)[0]
     coordinate_list = read_coords_as_tuple(file_name)
@@ -107,25 +114,37 @@ def find_best_path():
 
     best_length = float('inf')
     best_path = None
-    #waiting for keyboard interrupt
-    try:
-        while True:
-            path_length, new_path = nn_temperature(best_length, dist_matrix)
+    
+    user_flag = False
 
-            if path_length < best_length:
-                best_length = path_length
-                best_path = new_path
-                print(f"New best length is {best_length}")
+    def user_interrupt():
+        nonlocal user_flag
+        input()
+        user_flag = True
+
+    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        sys.stdin.readline()
+
+
+    threading.Thread(target=user_interrupt, daemon = True).start()
+    
+    #waiting for keyboard interrupt
+    while not user_flag:
+        path_length, new_path = nn_temperature(best_length, dist_matrix)
+
+        if path_length < best_length:
+            best_length = path_length
+            best_path = new_path
+            print(f"New best length is {best_length}")
 
 
     #need to have if statement for keyboard interrupt
-    except KeyboardInterrupt:
-        print("\n Search stopped!")
-        print(f"The best path is: {math.ceil(best_length)}")
-        plot_path(coordinate_list, best_path, f"{base_name}.jpeg")
-        print("\n The path order is: ")
-        print(best_path)
-        return best_path
+    print("\n Search stopped!")
+    print(f"The best path is: {math.ceil(best_length)}")
+    plot_path(coordinate_list, best_path, f"{base_name}.jpeg")
+    print("\n The path order is: ")
+    print(best_path)
+    return best_path
 
 
 if __name__ == "__main__":
