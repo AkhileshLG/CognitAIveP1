@@ -128,6 +128,8 @@ def find_best_path():
 
     threading.Thread(target=user_interrupt, daemon = True).start()
     
+    time_start = time.time()
+
     #waiting for keyboard interrupt
     while not user_flag:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
@@ -136,8 +138,11 @@ def find_best_path():
             best_length = path_length
             best_path = new_path
             print(f"New best length is {best_length}")
-
-
+            
+            time_elapsed = time.time() - time_start
+            
+            print(f"Time Elapsed: {time_elapsed}")
+    time_stop = time.time()
     print("\n Search stopped!")
     print(f"The best path is: {math.ceil(best_length)}")
     plot_path(coordinate_list, best_path, f"{base_name}.jpeg")
