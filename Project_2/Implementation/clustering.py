@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans
+from typing import List, Tuple
 import csv
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
