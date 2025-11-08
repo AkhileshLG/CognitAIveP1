@@ -7,6 +7,7 @@ import sys
 import threading
 import random
 import select
+import time
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -21,7 +22,8 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
 
 def createCluster(coords):
     oneCluster_1, twoClusters_1, twoClusters_2, threeClusters_1, threeClusters_2, threeClusters_3, fourClusters_1, fourClusters_2, fourClusters_3, fourClusters_4 = []
-
+    oneClusterBSF, oneClusterLSF, twoClusters1BSF, twoClusters1LSF, twoClusters2BSF, twoClusters2LSF, threeClusters1BSF, threeClusters1LSF, threeClusters2BSF, threeClusters2LSF, threeClusters3BSF, threeClusters3LSF, fourClusters1BSF, fourClusters1LSF, fourClusters2BSF, fourClusters2LSF, fourClusters3BSF, fourClusters3LSF, fourClusters4BSF, fourClusters4LSF = 0
+    totalDistance = 0
     coords_np = np.array(coords)
 
     for i in range(1,4):
@@ -35,20 +37,39 @@ def createCluster(coords):
             cluster_coords = coords_np[labels == j].toList()
             clusters.append(cluster_coords)
 
-            if i==1:
-                oneCluster_1 = clusters[0]
-            elif i==2:
-                twoClusters_1 = clusters[0]
-                twoClusters_2 = clusters[1]
-            elif i==3:
-                threeClusters_1 = clusters[0]
-                threeClusters_2 = clusters[1]
-                threeClusters_3 = clusters[2]
-            elif i==4:
-                fourClusters_1 = clusters[0]
-                fourClusters_2 = clusters[1]
-                fourClusters_3 = clusters[2]
-                fourClusters_4 = clusters[3]
+        if i==1:
+            oneCluster_1 = clusters[0]
+            oneClusterBSF, oneClusterLSF = find_best_path(oneCluster_1)
+            totalDistance = oneClusterLSF
+        elif i==2:
+            twoClusters_1 = clusters[0]
+            twoClusters_2 = clusters[1]
+            twoClusters1BSF, twoClusters1LSF = find_best_path(twoClusters_1)
+            twoClusters2BSF, twoClusters2LSF = find_best_path(twoClusters_2)
+            totalDistance = twoClusters1LSF + twoClusters2LSF
+        elif i==3:
+            threeClusters_1 = clusters[0]
+            threeClusters_2 = clusters[1]
+            threeClusters_3 = clusters[2]
+            threeClusters1BSF, threeClusters1LSF = find_best_path(threeClusters_1)
+            threeClusters2BSF, threeClusters2LSF = find_best_path(threeClusters_2)
+            threeClusters3BSF, threeClusters3LSF = find_best_path(threeClusters_3)
+            totalDistance = threeClusters1LSF + threeClusters2LSF + threeClusters3LSF
+        elif i==4:
+            fourClusters_1 = clusters[0]
+            fourClusters_2 = clusters[1]
+            fourClusters_3 = clusters[2]
+            fourClusters_4 = clusters[3]
+            fourClusters1BSF, fourClusters1LSF = find_best_path(fourClusters_1)
+            fourClusters2BSF, fourClusters2LSF = find_best_path(fourClusters_2)
+            fourClusters3BSF, fourClusters3LSF = find_best_path(fourClusters_3)
+            fourClusters4BSF, fourClusters4LSF = find_best_path(fourClusters_4)
+            totalDistance = fourClusters1LSF + fourClusters2LSF + fourClusters3LSF + fourClusters4LSF
+        
+        print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
+        for k in range(1, i):
+            print("    " + str(k) + "Landing Pad " + str(k) + " should be at ")
+
     
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
@@ -61,7 +82,6 @@ def distance_matrix(coordinates):
     return dist_matrix
 
 def nn_temperature(best_path, matrix):
-
     starting_node = 0
 
     path = [starting_node]
@@ -108,28 +128,20 @@ def find_best_path(clusterCoords):
 
     best_length = float('inf')
     best_path = None
-    
-    user_flag = False
-
-    def user_interrupt():
-        nonlocal user_flag
-        input()
-        user_flag = True
 
     if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         sys.stdin.readline()
 
-    threading.Thread(target=user_interrupt, daemon = True).start()
+    startTime = time.time()
 
-    #waiting for keyboard interrupt
-    while not user_flag:
+    while (time.time() - startTime) < 10:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
 
         if path_length < best_length:
             best_length = path_length
             best_path = new_path
 
-    return best_path
+    return best_path, best_length
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
