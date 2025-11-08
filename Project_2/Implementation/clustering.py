@@ -3,6 +3,10 @@ from typing import List, Tuple
 from datetime import datetime, timedelta
 import numpy as np
 import csv
+import sys
+import threading
+import random
+import select
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -46,6 +50,86 @@ def createCluster(coords):
                 fourClusters_3 = clusters[2]
                 fourClusters_4 = clusters[3]
     
+def distance_matrix(coordinates):
+    coordinates = np.array(coordinates)
+    x = coordinates[:,0]
+    y = coordinates[:,1]
+
+    dx = x[:, np.newaxis] - x [np.newaxis, :]
+    dy = y[:,np.newaxis] - y[np.newaxis,:]
+    dist_matrix = np.sqrt(dx**2 + dy**2)
+    return dist_matrix
+
+def nn_temperature(best_path, matrix):
+
+    starting_node = 0
+
+    path = [starting_node]
+    visited = {starting_node}
+    path_length = 0
+
+    next_node = random.choice([i for i in range(1,len(matrix))])
+    path.append(next_node)
+    visited.add(next_node)
+    path_length = matrix[starting_node][next_node]
+
+    for i in range(len(matrix) - 2):
+        curr_node = path[-1]
+        next_node = None
+        best_distance = float('inf')
+        
+        for j in range(len(matrix)):
+            if j in visited:
+                continue
+            curr_distance = matrix[curr_node][j]
+
+         
+            if curr_distance < best_distance:
+                next_node = j
+                best_distance = curr_distance
+    
+        if next_node is None:
+            return float('inf'), None
+        path_length += best_distance
+        path.append(next_node)
+        visited.add(next_node)
+        
+        if path_length >= best_path:
+            return float('inf'), None
+
+
+    path_length += matrix[path[-1]][0]
+    path.append(0)
+
+    return path_length, path
+
+def find_best_path(clusterCoords):
+    dist_matrix = distance_matrix(clusterCoords)
+
+    best_length = float('inf')
+    best_path = None
+    
+    user_flag = False
+
+    def user_interrupt():
+        nonlocal user_flag
+        input()
+        user_flag = True
+
+    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        sys.stdin.readline()
+
+    threading.Thread(target=user_interrupt, daemon = True).start()
+
+    #waiting for keyboard interrupt
+    while not user_flag:
+        path_length, new_path = nn_temperature(best_length, dist_matrix)
+
+        if path_length < best_length:
+            best_length = path_length
+            best_path = new_path
+
+    return best_path
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
