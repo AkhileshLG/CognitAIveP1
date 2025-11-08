@@ -1,5 +1,6 @@
 from sklearn.cluster import KMeans
 from typing import List, Tuple
+from datetime import datetime, timedelta
 import numpy as np
 import csv
 
@@ -50,5 +51,7 @@ if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
     tempFileName = "../Dataset/" + fileName
     coords = read_coords_as_tuple(tempFileName)
+    estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
+    print("There are " + str(len(coords)) + "nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
 
     createCluster(coords)
