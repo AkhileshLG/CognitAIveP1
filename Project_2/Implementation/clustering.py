@@ -21,54 +21,28 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
     return coordinates
 
 def createCluster(coords):
-    oneCluster_1, twoClusters_1, twoClusters_2, threeClusters_1, threeClusters_2, threeClusters_3, fourClusters_1, fourClusters_2, fourClusters_3, fourClusters_4 = []
-    oneClusterBSF, oneClusterLSF, twoClusters1BSF, twoClusters1LSF, twoClusters2BSF, twoClusters2LSF, threeClusters1BSF, threeClusters1LSF, threeClusters2BSF, threeClusters2LSF, threeClusters3BSF, threeClusters3LSF, fourClusters1BSF, fourClusters1LSF, fourClusters2BSF, fourClusters2LSF, fourClusters3BSF, fourClusters3LSF, fourClusters4BSF, fourClusters4LSF = 0
-    totalDistance = 0
     coords_np = np.array(coords)
-
-    for i in range(1,4):
-        kmeans = KMeans(n_clusters=i)
+    for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
+        kmeans = KMeans(n_clusters=i, n_init="auto")
         kmeans.fit(coords_np)
+        labels=kmeans.labels_
+        centroids = kmeans.cluster_centers_
+        clusters=[]
 
-        labels = kmeans.labels_
-
-        clusters = []
-        for j in range(kmeans.n_clusters):
-            cluster_coords = coords_np[labels == j].toList()
-            clusters.append(cluster_coords)
-
-        if i==1:
-            oneCluster_1 = clusters[0]
-            oneClusterBSF, oneClusterLSF = find_best_path(oneCluster_1)
-            totalDistance = oneClusterLSF
-        elif i==2:
-            twoClusters_1 = clusters[0]
-            twoClusters_2 = clusters[1]
-            twoClusters1BSF, twoClusters1LSF = find_best_path(twoClusters_1)
-            twoClusters2BSF, twoClusters2LSF = find_best_path(twoClusters_2)
-            totalDistance = twoClusters1LSF + twoClusters2LSF
-        elif i==3:
-            threeClusters_1 = clusters[0]
-            threeClusters_2 = clusters[1]
-            threeClusters_3 = clusters[2]
-            threeClusters1BSF, threeClusters1LSF = find_best_path(threeClusters_1)
-            threeClusters2BSF, threeClusters2LSF = find_best_path(threeClusters_2)
-            threeClusters3BSF, threeClusters3LSF = find_best_path(threeClusters_3)
-            totalDistance = threeClusters1LSF + threeClusters2LSF + threeClusters3LSF
-        elif i==4:
-            fourClusters_1 = clusters[0]
-            fourClusters_2 = clusters[1]
-            fourClusters_3 = clusters[2]
-            fourClusters_4 = clusters[3]
-            fourClusters1BSF, fourClusters1LSF = find_best_path(fourClusters_1)
-            fourClusters2BSF, fourClusters2LSF = find_best_path(fourClusters_2)
-            fourClusters3BSF, fourClusters3LSF = find_best_path(fourClusters_3)
-            fourClusters4BSF, fourClusters4LSF = find_best_path(fourClusters_4)
-            totalDistance = fourClusters1LSF + fourClusters2LSF + fourClusters3LSF + fourClusters4LSF
-        
+        for j in range(i):
+            clusters_coords = coords_np[labels == j].tolist()
+            clusters.append(clusters_coords)
+            
+        totalDistance = 0
+        for cluster in clusters:
+            if len(cluster)>0:
+                _, clusterDist = find_best_path(cluster)
+                totalDistance += clusterDist
+    
         print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
-        for k in range(1, i):
-            print("    " + str(k) + "Landing Pad " + str(k) + " should be at ")
+        print("    Suggested landing pad spots")
+        for j, c in enumerate(centroids):
+            print(f"    Drone{j+1} Landing Pad -> ({c[0]:.2f}, {c[1]:.2f})")
 
     
 def distance_matrix(coordinates):
@@ -148,6 +122,6 @@ if __name__ == "__main__":
     tempFileName = "../Dataset/" + fileName
     coords = read_coords_as_tuple(tempFileName)
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
-    print("There are " + str(len(coords)) + "nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
+    print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
 
     createCluster(coords)
