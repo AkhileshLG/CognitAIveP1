@@ -40,9 +40,8 @@ def createCluster(coords):
                 totalDistance += clusterDist
     
         print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
-        print("    Suggested landing pad spots")
         for j, c in enumerate(centroids):
-            print(f"    Drone{j+1} Landing Pad -> ({c[0]:.2f}, {c[1]:.2f})")
+            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {str(len(clusters[j]))}, route is ")
 
     
 def distance_matrix(coordinates):
