@@ -20,7 +20,7 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
             coordinates.append((x, y))
     return coordinates
 
-def createCluster(coords):
+def createCluster(coords, fileNames):
     coords_np = np.array(coords)
     for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
         kmeans = KMeans(n_clusters=i, n_init="auto")
@@ -42,6 +42,9 @@ def createCluster(coords):
         print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
         for j, c in enumerate(centroids):
             print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {str(len(clusters[j]))}, route is ")
+    
+    fileNumber = input("Please select your choice 1 to 4: ")
+
 
     
 def distance_matrix(coordinates):
@@ -123,4 +126,4 @@ if __name__ == "__main__":
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
 
-    createCluster(coords)
+    createCluster(coords, fileName)
