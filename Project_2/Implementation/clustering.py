@@ -103,8 +103,8 @@ def find_best_path(clusterCoords):
     best_length = float('inf')
     best_path = None
 
-    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-        sys.stdin.readline()
+    #if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+    #    sys.stdin.readline()
 
     startTime = time.time()
 
