@@ -38,7 +38,7 @@ def createCluster(coords):
             if len(cluster)>0:
                 _, clusterDist = find_best_path(cluster)
                 totalDistance += clusterDist
-    
+
         print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
         for j, c in enumerate(centroids):
             print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {str(len(clusters[j]))}, route is ")
