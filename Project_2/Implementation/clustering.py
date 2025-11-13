@@ -75,9 +75,25 @@ def createCluster(coords, fileName):
         for j, c in enumerate(centroids):
             print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f}")
     
-    fileNumber = input("Please select your choice 1 to 4: ")
-
-
+    fileNumber = int(input("Please select your choice 1 to 4: "))
+    if fileNumber == 1:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(oneClusterLSF[0])) + ".txt"
+        print("Writing " + solution1 + " to disk")
+    elif fileNumber == 2:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(twoClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(twoClusterLSF[1])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + " to disk")
+    elif fileNumber == 3:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(threeClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(threeClusterLSF[1])) + ".txt"
+        solution3 = fileName + "_3_SOLUTION_" + str(round(threeClusterLSF[2])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + ", " + solution3 + " to disk")
+    elif fileNumber == 4:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(fourClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(fourClusterLSF[1])) + ".txt"
+        solution3 = fileName + "_3_SOLUTION_" + str(round(fourClusterLSF[2])) + ".txt"
+        solution4 = fileName + "_4_SOLUTION_" + str(round(fourClusterLSF[3])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + ", " + solution3 + ", " + solution4 + " to disk")
     
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
