@@ -20,14 +20,28 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
             coordinates.append((x, y))
     return coordinates
 
-def createCluster(coords, fileNames):
+def createCluster(coords, fileName):
     coords_np = np.array(coords)
+    oneClusterBSF = []
+    oneClusterLSF = []
+    twoClusterBSF = []
+    twoClusterLSF = []
+    threeClusterBSF = []
+    threeClusterLSF = []
+    fourClusterBSF = []
+    fourClusterLSF = []
+    oneCentroid = []
+    twoCentroids = []
+    threeCentroids = []
+    fourCentroids = []
+
     for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
         kmeans = KMeans(n_clusters=i, n_init="auto")
         kmeans.fit(coords_np)
         labels=kmeans.labels_
         centroids = kmeans.cluster_centers_
         clusters=[]
+        individualDists = []
 
         for j in range(i):
             clusters_coords = coords_np[labels == j].tolist()
@@ -38,10 +52,28 @@ def createCluster(coords, fileNames):
             if len(cluster)>0:
                 _, clusterDist = find_best_path(cluster)
                 totalDistance += clusterDist
+                individualDists.append(clusterDist)
+                
+                if i==1:
+                    oneClusterBSF.append(_)
+                    oneClusterLSF.append(clusterDist)
+                    oneCentroid = centroids
+                elif i==2:
+                    twoClusterBSF.append(_)
+                    twoClusterLSF.append(clusterDist)
+                    twoCentroids = centroids
+                elif i==3:
+                    threeClusterBSF.append(_)
+                    threeClusterLSF.append(clusterDist)
+                    threeCentroids = centroids
+                elif i==4:
+                    fourClusterBSF.append(_)
+                    fourClusterLSF.append(clusterDist)
+                    fourCentroids = centroids
 
-        print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
+        print(f"{i}) If you use {i} drone(s), the total route will be {totalDistance:.2f} meters")
         for j, c in enumerate(centroids):
-            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {str(len(clusters[j]))}, route is ")
+            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f}")
     
     fileNumber = input("Please select your choice 1 to 4: ")
 
@@ -110,7 +142,7 @@ def find_best_path(clusterCoords):
 
     startTime = time.time()
 
-    while (time.time() - startTime) < 10:
+    while (time.time() - startTime) < 20:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
 
         if path_length < best_length:
@@ -121,7 +153,7 @@ def find_best_path(clusterCoords):
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
-    tempFileName = "../Dataset/" + fileName
+    tempFileName = "../Dataset/" + fileName + ".csv"
     coords = read_coords_as_tuple(tempFileName)
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
