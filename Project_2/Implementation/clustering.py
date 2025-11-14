@@ -8,6 +8,38 @@ import threading
 import random
 import select
 import time
+import matplotlib.pyplot as plt
+
+def plot_clusters_and_paths(coords, labels, center, cluster_best_paths, output = "clusters"):
+    plt.figure(figsize=(8,8))
+    num_clusters = len(center)
+    cmap = plt.get_cmap("tab10",num_clusters)
+    coords = np.array(coords)
+
+    for i in range(num_clusters):
+        mask = (labels ==i)
+        clusters_points = coords[mask]
+        color = cmap (i%10)
+        if clusters_points.size > 0:
+            plt.scatter(clusters_points[:,0], clusters_points[:,1], color = color, s = 20, label = f"Cluster {i+1}")
+        c = center[i]
+        plt.scatter(c[0],c[1], marker = 'X', s = 100, color = color, edgecolor = 'blue')
+        if i < len(cluster_best_paths):
+            path = cluster_best_paths[i]
+            cluster_coordinates = clusters_points.tolist()
+            try:
+                path_coords = [cluster_coordinates[idx] for idx in path]
+                xs = [p[0] for p in path_coords]
+                ys = [p[1] for p in path_coords]
+                plt.plot(xs,ys, '-', color = color, linewidth=1)
+                plt.plot(xs,ys, 'o', color = color, markersize=4)
+            except Exception:
+                pass
+    plt.title(output)
+    plt.xlabel("X Coordinate")
+    plt.ylabel("Y Coordinate")
+    plt.legend(loc = "best")
+    plt.savefig(output + ".png", dpi = 100)
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
     coordinates = []
@@ -20,7 +52,7 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
             coordinates.append((x, y))
     return coordinates
 
-def createCluster(coords):
+def createCluster(coords, file_name):
     coords_np = np.array(coords)
     for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
         kmeans = KMeans(n_clusters=i, n_init="auto")
@@ -34,15 +66,21 @@ def createCluster(coords):
             clusters.append(clusters_coords)
             
         totalDistance = 0
+        cluster_best_paths = []
         for cluster in clusters:
             if len(cluster)>0:
                 _, clusterDist = find_best_path(cluster)
                 totalDistance += clusterDist
+                cluster_best_paths.append(_)
+            else:
+                cluster_best_paths.append(None)
     
         print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
         print("    Suggested landing pad spots")
         for j, c in enumerate(centroids):
             print(f"    Drone{j+1} Landing Pad -> ({c[0]:.2f}, {c[1]:.2f})")
+        output = f"{file_name[:-4]}_{i}_Drones "
+        plot_clusters_and_paths(coords_np, labels, centroids, cluster_best_paths, output= output)
 
     
 def distance_matrix(coordinates):
@@ -124,4 +162,4 @@ if __name__ == "__main__":
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
 
-    createCluster(coords)
+    createCluster(coords, fileName)
