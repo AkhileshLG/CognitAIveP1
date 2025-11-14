@@ -132,16 +132,16 @@ def createCluster(coords, file_name):
         print("Writing " + solution1 + " to disk")
         plot_clusters_and_paths(coords_np, oneLabels, oneCentroid, oneClusterBSF, output=output)
         with open(solution1, "a") as f:
-            f.write(oneClusterBSF[0])
+            f.write(str(oneClusterBSF[0]))
     elif fileNumber == 2:
         solution1 = fileName + "_1_SOLUTION_" + str(round(twoClusterLSF[0])) + ".txt"
         solution2 = fileName + "_2_SOLUTION_" + str(round(twoClusterLSF[1])) + ".txt"
         print("Writing " + solution1 + ", " + solution2 + " to disk")
         plot_clusters_and_paths(coords_np, twoLabels, twoCentroids, twoClusterBSF, output=output)
         with open(solution1, "a") as f:
-            f.write(twoClusterBSF[0])
+            f.write(str(twoClusterBSF[0]))
         with open(solution2, "a") as f:
-            f.write(twoClusterBSF[1])
+            f.write(str(twoClusterBSF[1]))
     elif fileNumber == 3:
         solution1 = fileName + "_1_SOLUTION_" + str(round(threeClusterLSF[0])) + ".txt"
         solution2 = fileName + "_2_SOLUTION_" + str(round(threeClusterLSF[1])) + ".txt"
@@ -149,11 +149,11 @@ def createCluster(coords, file_name):
         print("Writing " + solution1 + ", " + solution2 + ", " + solution3 + " to disk")
         plot_clusters_and_paths(coords_np, threeLabels, threeCentroids, threeClusterBSF, output=output)
         with open(solution1, "a") as f:
-            f.write(threeClusterBSF[0])
+            f.write(str(threeClusterBSF[0]))
         with open(solution2, "a") as f:
-            f.write(threeClusterBSF[1])
+            f.write(str(threeClusterBSF[1]))
         with open(solution3, "a") as f:
-            f.write(threeClusterBSF[2])
+            f.write(str(threeClusterBSF[2]))
     elif fileNumber == 4:
         solution1 = fileName + "_1_SOLUTION_" + str(round(fourClusterLSF[0])) + ".txt"
         solution2 = fileName + "_2_SOLUTION_" + str(round(fourClusterLSF[1])) + ".txt"
