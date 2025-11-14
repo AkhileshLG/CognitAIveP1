@@ -40,8 +40,9 @@ def plot_clusters_and_paths(coords, labels, center, cluster_best_paths, output =
     plt.ylabel("Y Coordinate")
     plt.legend(loc = "best")
     plt.savefig(output + ".png", dpi = 100)
+    plt.close()
 
-def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]: 
+def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
     coordinates = []
     with open(file_path, 'r', newline='') as csvfile:
         csv_reader = csv.reader(csvfile)
@@ -54,26 +55,13 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
 
 def createCluster(coords, file_name):
     coords_np = np.array(coords)
-    oneClusterBSF = []
-    oneClusterLSF = []
-    twoClusterBSF = []
-    twoClusterLSF = []
-    threeClusterBSF = []
-    threeClusterLSF = []
-    fourClusterBSF = []
-    fourClusterLSF = []
-    oneCentroid = []
-    twoCentroids = []
-    threeCentroids = []
-    fourCentroids = []
-
-    for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
+    
+    for i in range(1,5):
         kmeans = KMeans(n_clusters=i, n_init="auto")
         kmeans.fit(coords_np)
-        labels=kmeans.labels_
+        labels = kmeans.labels_
         centroids = kmeans.cluster_centers_
-        clusters=[]
-        individualDists = []
+        clusters = []
 
         for j in range(i):
             clusters_coords = coords_np[labels == j].tolist()
@@ -82,10 +70,10 @@ def createCluster(coords, file_name):
         totalDistance = 0
         cluster_best_paths = []
         for cluster in clusters:
-            if len(cluster)>0:
-                _, clusterDist = find_best_path(cluster)
+            if len(cluster) > 0:
+                best_path, clusterDist = find_best_path(cluster)
                 totalDistance += clusterDist
-                cluster_best_paths.append(_)
+                cluster_best_paths.append(best_path)
             else:
                 cluster_best_paths.append(None)
     
@@ -93,23 +81,21 @@ def createCluster(coords, file_name):
         print("    Suggested landing pad spots")
         for j, c in enumerate(centroids):
             print(f"    Drone{j+1} Landing Pad -> ({c[0]:.2f}, {c[1]:.2f})")
-        output = f"{file_name[:-4]}_{i}_Drones "
-        plot_clusters_and_paths(coords_np, labels, centroids, cluster_best_paths, output= output)
+        
+        output = f"{file_name}_{i}_Drones"
+        plot_clusters_and_paths(coords_np, labels, centroids, cluster_best_paths, output=output)
 
-    
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
     x = coordinates[:,0]
     y = coordinates[:,1]
-
-    dx = x[:, np.newaxis] - x [np.newaxis, :]
+    dx = x[:, np.newaxis] - x[np.newaxis, :]
     dy = y[:,np.newaxis] - y[np.newaxis,:]
     dist_matrix = np.sqrt(dx**2 + dy**2)
     return dist_matrix
 
 def nn_temperature(best_path, matrix):
     starting_node = 0
-
     path = [starting_node]
     visited = {starting_node}
     path_length = 0
@@ -128,14 +114,13 @@ def nn_temperature(best_path, matrix):
             if j in visited:
                 continue
             curr_distance = matrix[curr_node][j]
-
-         
             if curr_distance < best_distance:
                 next_node = j
                 best_distance = curr_distance
     
         if next_node is None:
             return float('inf'), None
+        
         path_length += best_distance
         path.append(next_node)
         visited.add(next_node)
@@ -143,26 +128,18 @@ def nn_temperature(best_path, matrix):
         if path_length >= best_path:
             return float('inf'), None
 
-
     path_length += matrix[path[-1]][0]
     path.append(0)
-
     return path_length, path
 
 def find_best_path(clusterCoords):
     dist_matrix = distance_matrix(clusterCoords)
-
     best_length = float('inf')
     best_path = None
-
-    #if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-    #    sys.stdin.readline()
-
+    
     startTime = time.time()
-
     while (time.time() - startTime) < 20:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
-
         if path_length < best_length:
             best_length = path_length
             best_path = new_path
@@ -171,10 +148,9 @@ def find_best_path(clusterCoords):
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
-    tempFileName = "../Dataset/" + fileName + ".csv"
+    tempFileName = "../Dataset/" + fileName
     coords = read_coords_as_tuple(tempFileName)
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
-
-    createCluster(coords, fileName)
-    createCluster(coords, fileName)
+    
+    createCluster(coords, fileName[:-4])
