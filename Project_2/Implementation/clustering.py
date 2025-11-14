@@ -39,7 +39,7 @@ def plot_clusters_and_paths(coords, labels, center, cluster_best_paths, output =
     plt.xlabel("X Coordinate")
     plt.ylabel("Y Coordinate")
     plt.legend(loc = "best")
-    plt.savefig(output + ".png", dpi = 100)
+    plt.savefig(output + ".jpeg", dpi = 100)
     plt.close()
 
 def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
@@ -118,15 +118,14 @@ def createCluster(coords, file_name):
     
         print(f"{i}) If you use {i} drone(s), the total route will be {totalDistance:.2f} meters")
         for j, c in enumerate(centroids):
-            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f}")
-        
-    output = f"{file_name}_{i}_Drones"    
+            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f}")   
     
     solution1 = ""
     solution2 = ""
     solution3 = ""
     solution4 = ""
     fileNumber = int(input("Please select your choice 1 to 4: "))
+    output = f"{file_name}_{fileNumber}_OVERALL_SOLUTION" 
     if fileNumber == 1:
         solution1 = fileName + "_1_SOLUTION_" + str(round(oneClusterLSF[0])) + ".txt"
         print("Writing " + solution1 + " to disk")
