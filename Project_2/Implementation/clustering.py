@@ -118,7 +118,7 @@ def createCluster(coords, file_name):
     
         print(f"{i}) If you use {i} drone(s), the total route will be {totalDistance:.2f} meters")
         for j, c in enumerate(centroids):
-            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f} meters")   
+            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f} meters")
     
     solution1 = ""
     solution2 = ""
