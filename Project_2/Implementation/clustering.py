@@ -54,12 +54,26 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
 
 def createCluster(coords, file_name):
     coords_np = np.array(coords)
+    oneClusterBSF = []
+    oneClusterLSF = []
+    twoClusterBSF = []
+    twoClusterLSF = []
+    threeClusterBSF = []
+    threeClusterLSF = []
+    fourClusterBSF = []
+    fourClusterLSF = []
+    oneCentroid = []
+    twoCentroids = []
+    threeCentroids = []
+    fourCentroids = []
+
     for i in range (1,5): #fixed loop, incorrectly looped 1-3 instead of 4
         kmeans = KMeans(n_clusters=i, n_init="auto")
         kmeans.fit(coords_np)
         labels=kmeans.labels_
         centroids = kmeans.cluster_centers_
         clusters=[]
+        individualDists = []
 
         for j in range(i):
             clusters_coords = coords_np[labels == j].tolist()
@@ -141,12 +155,12 @@ def find_best_path(clusterCoords):
     best_length = float('inf')
     best_path = None
 
-    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-        sys.stdin.readline()
+    #if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+    #    sys.stdin.readline()
 
     startTime = time.time()
 
-    while (time.time() - startTime) < 10:
+    while (time.time() - startTime) < 20:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
 
         if path_length < best_length:
@@ -157,9 +171,10 @@ def find_best_path(clusterCoords):
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
-    tempFileName = "../Dataset/" + fileName
+    tempFileName = "../Dataset/" + fileName + ".csv"
     coords = read_coords_as_tuple(tempFileName)
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
 
+    createCluster(coords, fileName)
     createCluster(coords, fileName)
