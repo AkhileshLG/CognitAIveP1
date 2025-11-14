@@ -55,6 +55,22 @@ def read_coords_as_tuple(file_path:str) -> List[Tuple[float,float]]:
 
 def createCluster(coords, file_name):
     coords_np = np.array(coords)
+    oneClusterBSF = []
+    oneClusterLSF = []
+    twoClusterBSF = []
+    twoClusterLSF = []
+    threeClusterBSF = []
+    threeClusterLSF = []
+    fourClusterBSF = []
+    fourClusterLSF = []
+    oneCentroid = []
+    twoCentroids = []
+    threeCentroids = []
+    fourCentroids = []
+    oneLabels = []
+    twoLabels = []
+    threeLabels = []
+    fourLabels = []
     
     for i in range(1,5):
         kmeans = KMeans(n_clusters=i, n_init="auto")
@@ -62,6 +78,7 @@ def createCluster(coords, file_name):
         labels = kmeans.labels_
         centroids = kmeans.cluster_centers_
         clusters = []
+        individualDists = []
 
         for j in range(i):
             clusters_coords = coords_np[labels == j].tolist()
@@ -74,16 +91,85 @@ def createCluster(coords, file_name):
                 best_path, clusterDist = find_best_path(cluster)
                 totalDistance += clusterDist
                 cluster_best_paths.append(best_path)
+                individualDists.append(clusterDist)
+               
+                if i==1:
+                    oneClusterBSF.append(best_path)
+                    oneClusterLSF.append(clusterDist)
+                    oneCentroid = centroids
+                    oneLabels = labels
+                elif i==2:
+                    twoClusterBSF.append(best_path)
+                    twoClusterLSF.append(clusterDist)
+                    twoCentroids = centroids
+                    twoLabels = labels
+                elif i==3:
+                    threeClusterBSF.append(best_path)
+                    threeClusterLSF.append(clusterDist)
+                    threeCentroids = centroids
+                    threeLabels = labels
+                elif i==4:
+                    fourClusterBSF.append(best_path)
+                    fourClusterLSF.append(clusterDist)
+                    fourCentroids = centroids
+                    fourLabels = labels
             else:
                 cluster_best_paths.append(None)
     
-        print(str(i) + ") If you use " + str(i) + " drone(s), the total route will be " + str(totalDistance) + " meters")
-        print("    Suggested landing pad spots")
+        print(f"{i}) If you use {i} drone(s), the total route will be {totalDistance:.2f} meters")
         for j, c in enumerate(centroids):
-            print(f"    Drone{j+1} Landing Pad -> ({c[0]:.2f}, {c[1]:.2f})")
+            print(f"    Landing Pad {j+1} should be at ({c[0]:.2f}, {c[1]:.2f}), serving {len(clusters[j])}, route is {individualDists[j]:.2f}")
         
-        output = f"{file_name}_{i}_Drones"
-        plot_clusters_and_paths(coords_np, labels, centroids, cluster_best_paths, output=output)
+    output = f"{file_name}_{i}_Drones"    
+    
+    solution1 = ""
+    solution2 = ""
+    solution3 = ""
+    solution4 = ""
+    fileNumber = int(input("Please select your choice 1 to 4: "))
+    if fileNumber == 1:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(oneClusterLSF[0])) + ".txt"
+        print("Writing " + solution1 + " to disk")
+        plot_clusters_and_paths(coords_np, oneLabels, oneCentroid, oneClusterBSF, output=output)
+        with open(solution1, "a") as f:
+            f.write(oneClusterBSF[0])
+    elif fileNumber == 2:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(twoClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(twoClusterLSF[1])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + " to disk")
+        plot_clusters_and_paths(coords_np, twoLabels, twoCentroids, twoClusterBSF, output=output)
+        with open(solution1, "a") as f:
+            f.write(twoClusterBSF[0])
+        with open(solution2, "a") as f:
+            f.write(twoClusterBSF[1])
+    elif fileNumber == 3:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(threeClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(threeClusterLSF[1])) + ".txt"
+        solution3 = fileName + "_3_SOLUTION_" + str(round(threeClusterLSF[2])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + ", " + solution3 + " to disk")
+        plot_clusters_and_paths(coords_np, threeLabels, threeCentroids, threeClusterBSF, output=output)
+        with open(solution1, "a") as f:
+            f.write(threeClusterBSF[0])
+        with open(solution2, "a") as f:
+            f.write(threeClusterBSF[1])
+        with open(solution3, "a") as f:
+            f.write(threeClusterBSF[2])
+    elif fileNumber == 4:
+        solution1 = fileName + "_1_SOLUTION_" + str(round(fourClusterLSF[0])) + ".txt"
+        solution2 = fileName + "_2_SOLUTION_" + str(round(fourClusterLSF[1])) + ".txt"
+        solution3 = fileName + "_3_SOLUTION_" + str(round(fourClusterLSF[2])) + ".txt"
+        solution4 = fileName + "_4_SOLUTION_" + str(round(fourClusterLSF[3])) + ".txt"
+        print("Writing " + solution1 + ", " + solution2 + ", " + solution3 + ", " + solution4 + " to disk")
+        plot_clusters_and_paths(coords_np, fourLabels, fourCentroids, fourClusterBSF, output=output)
+        with open(solution1, "a") as f:
+            f.write(str(fourClusterBSF[0]))
+        with open(solution2, "a") as f:
+            f.write(str(fourClusterBSF[1]))
+        with open(solution3, "a") as f:
+            f.write(str(fourClusterBSF[2]))
+        with open(solution4, "a") as f:
+            f.write(str(fourClusterBSF[3]))
+
 
 def distance_matrix(coordinates):
     coordinates = np.array(coordinates)
@@ -138,7 +224,7 @@ def find_best_path(clusterCoords):
     best_path = None
     
     startTime = time.time()
-    while (time.time() - startTime) < 20:
+    while (time.time() - startTime) < 25:
         path_length, new_path = nn_temperature(best_length, dist_matrix)
         if path_length < best_length:
             best_length = path_length
@@ -148,9 +234,9 @@ def find_best_path(clusterCoords):
 
 if __name__ == "__main__":
     fileName = input("Enter the name of the file: ")
-    tempFileName = "../Dataset/" + fileName
+    tempFileName = "../Dataset/" + fileName + ".csv"
     coords = read_coords_as_tuple(tempFileName)
     estimatedSolutionTime = datetime.now() + timedelta(minutes=5)
     print("There are " + str(len(coords)) + " nodes: Solutions will be available by " + estimatedSolutionTime.strftime("%I:%M %p"))
     
-    createCluster(coords, fileName[:-4])
+    createCluster(coords, fileName)
